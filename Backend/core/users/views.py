@@ -90,21 +90,22 @@ class RefreshView(APIView):
 
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            refresh_token = request.data.get("refresh_token")
+            refresh_token = request.COOKIES.get("refresh")
             if refresh_token:
                 token = RefreshToken(refresh_token)
                 token.blacklist()
-                return Response(status=status.HTTP_205_RESET_CONTENT)
+                response = Response(status=status.HTTP_205_RESET_CONTENT)
+                response.delete_cookie("access")
+                response.delete_cookie("refresh")
+                return response
             else:
                 return Response(
                     status=status.HTTP_400_BAD_REQUEST,
                     data={"error": "Refresh token not provided."},
                 )
-
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
 

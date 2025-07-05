@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux";
 import { Outlet } from "react-router";
 import authService from "./backend/auth";
 import { login, logout } from "./store/authSlice";
-import Header from "./components/Header/Header";
-import Footer from "./components/Footer/Footer";
+import Layout from "./components/Layout";
+import { Skeleton } from "./components/ui/skeleton";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -14,10 +14,10 @@ function App() {
     // Check for a valid session using the cookie on app load
     authService
       .refreshAccessToken()
-      .then((userData) => {
-        if (userData) {
-          // User is authenticated         
-          dispatch(login({ userData }));
+      .then((token) => {
+        if (token) {
+          // User is authenticated
+          dispatch(login({ token }));
         } else {
           // No active session
           dispatch(logout());
@@ -28,17 +28,19 @@ function App() {
         dispatch(logout());
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [dispatch]);
 
   // Show a loading screen while checking auth, otherwise show the app
   return !loading ? (
-    <div className="app-container">
-      <Header />
-      <Outlet />
-      <Footer />
+    <div>
+      <Layout>
+        <Outlet />
+      </Layout>
     </div>
   ) : (
-    <div>Loading...</div>
+    <div>
+      <Skeleton />
+    </div>
   );
 }
 
