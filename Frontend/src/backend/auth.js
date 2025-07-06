@@ -10,13 +10,13 @@ class AuthService {
     async login({ username, password }) {
         try {
             // Only send credentials, do not handle tokens in localStorage
-            await this.axios.post(
+            const response = await this.axios.post(
                 '/token/login/',
                 { username, password },
                 { headers: { 'Content-Type': 'application/json' } }
             );
             // The cookie is set by the backend, nothing to return
-            return { success: true };
+            return response.data;
         } catch (error) {
             throw error.response?.data?.detail || "Login failed";
         }
@@ -44,7 +44,6 @@ class AuthService {
     async getCurrentUser() {
         try {
             const response = await this.axios.get('/me/');
-            console.log(response.data);
             return response.data;
         } catch (error) {
             throw error;

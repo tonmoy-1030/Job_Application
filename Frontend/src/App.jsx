@@ -11,36 +11,30 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Check for a valid session using the cookie on app load
-    authService
-      .refreshAccessToken()
-      .then((token) => {
-        if (token) {
-          // User is authenticated
-          dispatch(login({ token }));
+    const initSession = async () => {
+      try {
+        const userData = await authService.getCurrentUser(); // /me/
+        if (userData) {
+          dispatch(login({ userData }));
         } else {
-          // No active session
           dispatch(logout());
         }
-      })
-      .catch((error) => {
-        console.error("Failed to fetch current user:", error);
+      } catch (err) {
         dispatch(logout());
-      })
-      .finally(() => setLoading(false));
-  }, [dispatch]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Show a loading screen while checking auth, otherwise show the app
-  return !loading ? (
-    <div>
-      <Layout>
-        <Outlet />
-      </Layout>
-    </div>
+    initSession();
+  }, []);
+
+  return loading ? (
+    <Skeleton />
   ) : (
-    <div>
-      <Skeleton />
-    </div>
+    <Layout>
+      <Outlet />
+    </Layout>
   );
 }
 

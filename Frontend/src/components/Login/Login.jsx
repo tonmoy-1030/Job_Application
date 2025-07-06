@@ -18,9 +18,10 @@ const Login = () => {
   const login = async (data) => {
     setError("");
     try {
-      const session = await authService.login(data);
-      if (session) {
-        dispatch(authLogin({ userData: session }));
+      const userData = await authService.login(data);
+      
+      if (userData) {
+        dispatch(authLogin({ userData: userData.user }));
         navigate("/");
       } else {
         setError("Invalid email or password");

@@ -6,12 +6,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .serializers  import UserSerializer
-
+from .serializers import UserSerializer
+from .serializers import MyTokenObtainPairSerializer
 
 
 # Create your views here.
 class LoginView(APIView):
+
     def post(self, request):
         try:
             username = request.data.get("username")
@@ -109,6 +110,7 @@ class LogoutView(APIView):
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
 
+
 class meView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -117,4 +119,6 @@ class meView(APIView):
             serializer = UserSerializer(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

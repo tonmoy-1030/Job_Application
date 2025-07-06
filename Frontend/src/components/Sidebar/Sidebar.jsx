@@ -21,11 +21,12 @@ import {
 } from "../ui/dropdown-menu";
 import { User2 } from "lucide-react";
 import authService from "../../backend/auth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {logout} from '../../store/authSlice'
 
 function AppSidebar() {
   const dispatch = useDispatch();
+  const userData = useSelector((state)=>state.auth.userData)
   const logoutHandler = () => {
     authService
       .logout()
@@ -65,7 +66,7 @@ function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> <span>Profile</span>
+                  <User2 /> <span>{userData.username}</span>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
