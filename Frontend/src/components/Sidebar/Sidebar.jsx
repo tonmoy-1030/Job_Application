@@ -23,15 +23,18 @@ import { User2 } from "lucide-react";
 import authService from "../../backend/auth";
 import { useDispatch, useSelector } from "react-redux";
 import {logout} from '../../store/authSlice'
+import {useNavigate} from "react-router";
 
 function AppSidebar() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userData = useSelector((state)=>state.auth.userData)
   const logoutHandler = () => {
     authService
       .logout()
       .then(() => {
         dispatch(logout());
+        navigate('/login')
       })
       .catch((error) => {
         console.error("Logout failed:", error);

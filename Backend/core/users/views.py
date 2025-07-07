@@ -8,10 +8,12 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .serializers import UserSerializer
 from .serializers import MyTokenObtainPairSerializer
+from rest_framework.permissions import AllowAny
 
 
 # Create your views here.
 class LoginView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
         try:
@@ -51,14 +53,14 @@ class LoginView(APIView):
                 value=str(refresh.access_token),
                 httponly=True,
                 samesite="Lax",
-                # secure=True,  # Enable in production
+                secure=True,  # Enable in production
             )
             response.set_cookie(
                 key="refresh",
                 value=str(refresh),
                 httponly=True,
                 samesite="Lax",
-                # secure=True,
+                secure=True,
             )
 
             return response

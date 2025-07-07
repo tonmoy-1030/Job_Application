@@ -1,30 +1,56 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import authService from "../../backend/auth";
 import { login as authLogin } from "../../store/authSlice";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { z } from "zod";
+
+// ✅ Schema includes both fields
+const formSchema = z.object({
+  username: z.string().min(2, {
+    message: "Username must be at least 2 characters.",
+  }),
+  password: z.string().min(4, {
+    message: "Password must be at least 4 characters.",
+  }),
+});
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [error, setError] = useState("");
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
   const login = async (data) => {
     setError("");
     try {
-      const userData = await authService.login(data);
       
+      const userData = await authService.login(data);
+
       if (userData) {
         dispatch(authLogin({ userData: userData.user }));
         navigate("/");
       } else {
-        setError("Invalid email or password");
+        setError("Invalid username or password");
       }
     } catch (error) {
       setError(error.message || "Something went wrong");
@@ -32,57 +58,55 @@ const Login = () => {
   };
 
   return (
-    <div className="mx-auto w-full max-w-lg bg-gray-100 rounded-lg p-10 border-black/10">
-      <div className="mb-2 flex justify-center">
-        <h1 className="text-xl font-bold">Login Form</h1>
-      </div>
-      {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
-      <form onSubmit={handleSubmit(login)} className="mt-8 space-y-6">
-        <div>
-          <label
-            htmlFor="username"
-            className="block text-sm font-medium text-gray-700"
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <FormProvider {...form}>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(login)}
+            className="w-full max-w-md p-8 bg-white rounded shadow space-y-6"
           >
-            User Name
-          </label>
-          <input
-            id="username"
-            type="text"
-            placeholder="Enter your username"
-            className="w-full p-2 border border-gray-300 rounded mt-1"
-            {...register("username", { required: true })}
-          />
-          {errors.username && (
-            <p className="text-red-500 text-sm">Username is required</p>
-          )}
-        </div>
+            <legend className="text-2xl font-semibold text-center text-gray-700">
+              Welcome Back
+            </legend>
 
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            className="w-full p-2 border border-gray-300 rounded mt-1"
-            {...register("password", { required: true })}
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm">Password is required</p>
-          )}
-        </div>
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-        >
-          Sign in
-        </button>
-      </form>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {error && (
+              <p className="text-red-500 text-sm text-center">{error}</p>
+            )}
+
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
+          </form>
+        </Form>
+      </FormProvider>
     </div>
   );
 };
