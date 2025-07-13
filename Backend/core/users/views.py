@@ -42,6 +42,7 @@ class LoginView(APIView):
                     "user": {
                         "id": user.id,
                         "username": user.username,
+                        'must_change_password': user.must_change_password
                     },
                     "access": str(refresh.access_token),
                     "refresh": str(refresh),
@@ -124,3 +125,23 @@ class meView(APIView):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class ChangePassword(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+        
+        if new_password or confirm_password is None:
+            return Response("Password is empty", status=status.HTTP_400_BAD_REQUEST)
+        
+        if new_password != confirm_password:
+            return Response("Password is not match", status=status.HTTP_400_BAD_REQUEST)
+        
+        user = request.user
+        user.set_password(new_password)
+        user.must_change_password = False 
+        user.save()
+        return Response("Password changed successfully", status=status.HTTP_200_OK)
+    
+        

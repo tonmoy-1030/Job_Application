@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 from api.routers import router
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from users.views import LogoutView, LoginView, RefreshView, meView
+from users.views import LogoutView, LoginView, RefreshView, meView, ChangePassword
 
 
 urlpatterns = [
@@ -29,4 +29,5 @@ urlpatterns = [
     path("api/token/refresh/", RefreshView.as_view(), name="token_refresh"),
     path("api/token/logout/", LogoutView.as_view(), name="token_logout"),
     path("api/me/", meView.as_view(), name="user"),
+    path("api/change-password/", ChangePassword.as_view(), name="change_password"),
 ]

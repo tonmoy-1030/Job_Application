@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from .models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ["id", "username", "email", "first_name", "last_name"]
+        model = CustomUser
+        fields = ["id", "username", "email", "first_name", "last_name", "must_change_password"]
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod

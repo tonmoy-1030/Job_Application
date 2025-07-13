@@ -1,6 +1,6 @@
 from django.db import models
 from utilities.models import Designation, Department, BusinessUnit
-from django.contrib.auth.models import User
+from users.models import CustomUser
 
 
 
@@ -20,7 +20,7 @@ class Job(models.Model):
     location = models.CharField(max_length=255, blank=True, null=True)
     date_posted = models.DateField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
 
     class Meta:
         db_table = "Job"

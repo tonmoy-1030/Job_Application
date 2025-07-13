@@ -50,6 +50,19 @@ class AuthService {
 
         }
     }
+
+    async changePassword({ new_password, confirm_password }) {
+        try {
+           const response = await this.axios.post(
+                '/change-password/',
+                { username, confirm_password },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+            return response.data
+        } catch (error) {
+            throw error
+        }
+    }
 }
 const authService = new AuthService();
 export default authService;

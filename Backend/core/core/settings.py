@@ -28,7 +28,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+AUTH_USER_MODEL = "users.CustomUser"
 
 # Application definition
 
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "jobs",
     "job_application",
     "corsheaders",
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -61,6 +62,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "core.urls"
 
 
+
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -69,9 +71,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-         "core.authentication.CookieJWTAuthentication"
-    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["core.authentication.CookieJWTAuthentication"],
 }
 
 SIMPLE_JWT = {

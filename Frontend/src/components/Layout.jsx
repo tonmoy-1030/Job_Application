@@ -4,9 +4,9 @@ import AppSidebar from "./Sidebar/Sidebar";
 import { useSelector } from "react-redux";
 import Login from "./Login/Login";
 
-function Layout({ children }) {
-  const authStatus = useSelector((state) => state.auth.authenticated);
-  return authStatus ? (
+function Layout({ children, layoutStatus=true }) {
+  
+  return layoutStatus ? (
     <SidebarProvider>
       <AppSidebar />
 
@@ -16,7 +16,7 @@ function Layout({ children }) {
       </main>
     </SidebarProvider>
   ) : (
-    <Login />
+    {children}
   );
 }
 

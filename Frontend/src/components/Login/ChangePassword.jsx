@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import authService from "../../backend/auth";
-import { login as authLogin } from "../../store/authSlice";
 import {
   Form,
   FormControl,
@@ -17,48 +15,42 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { z } from "zod";
 
-// ✅ Schema includes both fields
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-  password: z.string().min(4, {
-    message: "Password must be at least 4 characters.",
-  }),
-});
+// ✅ Schema now matches fields and includes confirm logic
+const formSchema = z
+  .object({
+    new_password: z.string().min(6, "Password must be at least 6 characters."),
+    confirm_password: z.string().min(6, "Confirm password is required."),
+  })
+  .refine((data) => data.new_password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"],
+  });
 
-const Login = () => {
+const ChangePassword = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [error, setError] = useState("");
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      new_password: "",
+      confirm_password: "",
     },
   });
 
-  const login = async (data) => {
+  const changePassword = async (data) => {
     setError("");
+    console.log(data)
     try {
-      const userData = await authService.login(data);
-
-      if (userData?.user) {
-        dispatch(authLogin({ userData: userData.user }));
-
-        if (userData.user.must_change_password) {
-          navigate("/change-password");
-        } else {
-          navigate("/");
-        }
+      const response = await authService.changePassword(data);
+      
+      if (response?.success) {
+        navigate("/login");
       } else {
-        setError("Invalid username or password");
+        setError("Failed to change password");
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError(error.message || "Something went wrong");
+    } catch (err) {
+      setError(err?.message || "Something went wrong");
     }
   };
 
@@ -67,21 +59,25 @@ const Login = () => {
       <FormProvider {...form}>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(login)}
+            onSubmit={form.handleSubmit(changePassword)}
             className="w-full max-w-md p-8 bg-white rounded shadow space-y-6"
           >
             <legend className="text-2xl font-semibold text-center text-gray-700">
-              Welcome Back
+              Change Your Password
             </legend>
 
             <FormField
               control={form.control}
-              name="username"
+              name="new_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>New Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="username" {...field} />
+                    <Input
+                      type="password"
+                      placeholder="Enter new password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -90,12 +86,16 @@ const Login = () => {
 
             <FormField
               control={form.control}
-              name="password"
+              name="confirm_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="password" {...field} />
+                    <Input
+                      type="password"
+                      placeholder="Confirm new password"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,7 +107,7 @@ const Login = () => {
             )}
 
             <Button type="submit" className="w-full">
-              Login
+              Submit
             </Button>
           </form>
         </Form>
@@ -116,4 +116,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ChangePassword;
