@@ -18,8 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from api.routers import router
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from users.views import LogoutView, LoginView, RefreshView, meView, ChangePassword
+from users.views import LogoutView, LoginView, RefreshView, meView, ChangePasswordView
 
 
 urlpatterns = [
@@ -29,5 +28,5 @@ urlpatterns = [
     path("api/token/refresh/", RefreshView.as_view(), name="token_refresh"),
     path("api/token/logout/", LogoutView.as_view(), name="token_logout"),
     path("api/me/", meView.as_view(), name="user"),
-    path("api/change-password/", ChangePassword.as_view(), name="change_password"),
+    path("api/change-password/", ChangePasswordView.as_view(), name="change_password"),
 ]
