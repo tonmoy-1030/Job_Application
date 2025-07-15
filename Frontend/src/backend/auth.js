@@ -55,7 +55,7 @@ class AuthService {
         try {
            const response = await this.axios.post(
                 '/change-password/',
-                { username, confirm_password },
+                { new_password, confirm_password },
                 { headers: { 'Content-Type': 'application/json' } }
             );
             return response.data
